@@ -8,7 +8,7 @@ import (
 
 type UserService struct{}
 
-func (us *UserService) CreateUser(request models.UsersRequest) (models.UsersResponse, error) {
+func (us *UserService) GetUserHashId(request models.UsersRequest) (models.UsersResponse, error) {
 	id, err := hashid.New(*request.Name + strconv.Itoa(*request.Age))
 	return models.UsersResponse{Id: id}, err
 }

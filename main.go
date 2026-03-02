@@ -8,7 +8,7 @@ import (
 
 func main() {
 	userService := &service.UserService{}
-	handler := handlers.MyHandlers{Service: userService}
+	handler := handlers.CreateUserHandler{Service: userService}
 	http.Handle("/users", &handler)
 	http.ListenAndServe("localhost:8080", nil)
 }
