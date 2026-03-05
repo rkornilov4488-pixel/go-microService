@@ -16,10 +16,10 @@ func (og *OrdersGenerator) GetRespOnOrderCreate(request *models.OrdersRequest) (
 	if request.UserId == nil || *request.UserId == "" {
 		return models.OrderResponse{Error: "user_id is required"}, errors.New("userId is empty")
 	}
-	if request.Items == nil || len(*request.Items) < 1 {
+	if request.Items == nil || len(request.Items) < 1 {
 		return models.OrderResponse{Error: "items required is not empty"}, errors.New("items is empty")
 	}
-	for _, item := range *request.Items {
+	for _, item := range request.Items {
 		if item.Product == nil || *item.Product == "" {
 			return models.OrderResponse{Error: "product is required"}, errors.New("product is empty")
 		}
@@ -32,7 +32,7 @@ func (og *OrdersGenerator) GetRespOnOrderCreate(request *models.OrdersRequest) (
 	}
 
 	var sum int
-	items := *request.Items
+	items := request.Items
 	for _, item := range items {
 		sum += *item.Price * *item.Quantity
 	}
