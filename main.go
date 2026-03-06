@@ -8,7 +8,10 @@ import (
 
 func main() {
 	userService := &service.UserService{}
-	handler := handlers.CreateUserHandler{Service: userService}
-	http.Handle("/users", &handler)
+	createUserHandler := handlers.CreateUserHandler{Service: userService}
+	orderGenerator := &service.OrdersGenerator{}
+	createOrderHandler := handlers.CreateOrderHandler{Service: orderGenerator}
+	http.Handle("/users", &createUserHandler)
+	http.Handle("/orders", &createOrderHandler)
 	http.ListenAndServe("localhost:8080", nil)
 }
