@@ -1,14 +1,16 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"myMicroService/internal/models"
 	"net/http"
 )
 
 type orderHandlerInterface interface {
-	GetRespOnOrderCreate(request *models.OrdersRequest) (models.OrderResponse, error)
+	GetRespOnOrderCreate(ctx context.Context, request *models.OrdersRequest) (models.OrderResponse, error)
 }
 
 type CreateOrderHandler struct {
@@ -34,8 +36,11 @@ func (h *CreateOrderHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return400ErrResponse(w, decodeReqBodyToStruct)
 		return
 	}
-	respStruct, errValidationReq := h.Service.GetRespOnOrderCreate(&requestStruct)
-	if errValidationReq != nil {
+	respStruct, serviceErr := h.Service.GetRespOnOrderCreate(r.Context(), &requestStruct)
+	if serviceErr != nil {
+		if errors.Is(serviceErr, context.Canceled) || errors.Is(serviceErr, context.DeadlineExceeded) {
+			return
+		}
 		byteResp, marshalToBytesErr := json.Marshal(respStruct)
 		if marshalToBytesErr != nil {
 			return400ErrResponse(w, marshalToBytesErr)

@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"myMicroService/internal/models"
 	"net/http"
@@ -22,7 +24,7 @@ type CreateUserHandler struct {
 }
 
 type createUserInterface interface {
-	GetUserHashId(request models.UsersRequest) (models.UsersResponse, error)
+	GetUserHashId(ctx context.Context, request models.UsersRequest) (models.UsersResponse, error)
 }
 
 func (h *CreateUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -32,14 +34,13 @@ func (h *CreateUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	requestBody := r.Body
 	defer r.Body.Close()
-	if requestBody == nil {
+	if r.Body == nil {
 		validateAndReturnNegativeUsersResponse(w)
 		return
 	}
 	var structReq models.UsersRequest
-	err := json.NewDecoder(requestBody).Decode(&structReq)
+	err := json.NewDecoder(r.Body).Decode(&structReq)
 	if err != nil {
 		validateAndReturnNegativeUsersResponse(w)
 		return
@@ -49,11 +50,16 @@ func (h *CreateUserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	structResp, parsErr := h.Service.GetUserHashId(structReq)
-	if parsErr != nil {
-		validateAndReturnNegativeUsersResponse(w)
-		return
+	structResp, serviceErr := h.Service.GetUserHashId(r.Context(), structReq)
+	if serviceErr != nil {
+		if errors.Is(serviceErr, context.Canceled) || errors.Is(serviceErr, context.DeadlineExceeded) {
+			return
+		} else {
+			validateAndReturnNegativeUsersResponse(w)
+			return
+		}
 	}
+
 	w.WriteHeader(http.StatusOK)
 	parsedResp, _ := json.Marshal(structResp)
 	_, errResp := w.Write(parsedResp)

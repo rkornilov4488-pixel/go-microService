@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"github.com/google/uuid"
 	"myMicroService/internal/models"
@@ -8,7 +9,11 @@ import (
 
 type OrdersGenerator struct{}
 
-func (og *OrdersGenerator) GetRespOnOrderCreate(request *models.OrdersRequest) (models.OrderResponse, error) {
+func (og *OrdersGenerator) GetRespOnOrderCreate(ctx context.Context, request *models.OrdersRequest) (models.OrderResponse, error) {
+
+	if ctx.Err() != nil {
+		return models.OrderResponse{}, ctx.Err()
+	}
 
 	if request == nil {
 		return models.OrderResponse{Error: "request body required"}, errors.New("request body is empty")
