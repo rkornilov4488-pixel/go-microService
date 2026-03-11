@@ -29,7 +29,14 @@ func (h *CreateOrderHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	defer r.Body.Close()
+
+	defer func() {
+		closeApiErr := r.Body.Close()
+		if closeApiErr != nil {
+			log.Println(closeApiErr)
+		}
+	}()
+
 	var requestStruct models.OrdersRequest
 	decodeReqBodyToStruct := json.NewDecoder(r.Body).Decode(&requestStruct)
 	if decodeReqBodyToStruct != nil {

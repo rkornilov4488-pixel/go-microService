@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"log"
+	"fmt"
 	"myMicroService/internal/models"
 )
 
@@ -16,10 +16,13 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 }
 
 func (repo *UserRepo) InsertUser(ctx context.Context, user models.User) error {
-	_, insertErr := repo.db.ExecContext(ctx, "INSERT INTO users (id, name, age) VALUES ($1, $2, $3)", user.Id, user.Name, user.Age)
+	_, insertErr := repo.db.ExecContext(
+		ctx,
+		"INSERT INTO users (id, name, age, user_id, last_name, surname) VALUES ($1, $2, $3, $4, $5, $6)",
+		user.Id, user.Name, user.Age, user.UserId, user.LastName, user.Surname,
+	)
 	if insertErr != nil {
-		log.Println(insertErr)
-		return insertErr
+		return fmt.Errorf("error inserting user: %w", insertErr)
 	}
 	return nil
 }
