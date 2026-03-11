@@ -36,5 +36,9 @@ func main() {
 
 	http.Handle("/users", loggingUserHandler)
 	http.Handle("/orders", loggingOrderHandler)
-	http.ListenAndServe("localhost:8080", nil)
+
+	err := http.ListenAndServe("localhost:8080", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

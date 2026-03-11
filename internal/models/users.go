@@ -1,8 +1,13 @@
 package models
 
+import "time"
+
 type UsersRequest struct {
-	Name *string `json:"name"`
-	Age  *int    `json:"age"`
+	UserId   *string `json:"user_id"`
+	Name     *string `json:"name"`
+	LastName *string `json:"last_name"`
+	Surname  *string `json:"surname"`
+	Age      *int    `json:"age"`
 }
 
 type UsersResponse struct {
@@ -11,7 +16,11 @@ type UsersResponse struct {
 }
 
 type User struct {
-	Id   string
-	Name string
-	Age  int
+	Id        string
+	Name      string
+	Age       int
+	UserId    string
+	LastName  string
+	Surname   string
+	CreatedAt time.Time
 }
